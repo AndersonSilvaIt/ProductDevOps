@@ -1,0 +1,65 @@
+name: CI/CD ProductAPI
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+    paths:
+      - 'ProductAPI/**'
+      - '.github/workflows/productapi-publish.yml'
+
+jobs:
+  build-and-push:
+    if: ${{ github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/product-api:latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" \
+            | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build Docker image
+        working-directory: ProductAPI
+        run: docker build -t $IMAGE_NAME .
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+  deploy-container:
+    needs: build-and-push
+    runs-on: [self-hosted, windows, x64]
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/product-api:latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Pull image
+        shell: powershell
+        run: |
+          Write-Host "Pulling image $Env:IMAGE_NAME"
+          docker pull $Env:IMAGE_NAME
+
+      - name: Remove old contaner (ignore if not exists)
+        shell: powershell
+        continue-on-error: true
+        run: |
+          Write-Host "Removing any existing container named 'productapi-container'"
+          docker rm -f productapi-container
+
+      - name: Start new container
+        shell: powershell
+        run: |
+          Write-Host "Starting new container on host 8088..."
+          docker run -d `
+            --name productapi-container `
+            -p 8088:80 `
+            -e ASPNETCORE_URLS="http://+:80" ` 
+            $Env:IMAGE_NAME
