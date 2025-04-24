@@ -24,8 +24,7 @@ namespace ProductAPI.Controllers
                 new ProductViewModel { Id =  6, Name = "Headset Gamer V2",      Price =   349.20m, Stock =  45 },
                 new ProductViewModel { Id =  7, Name = "SSD NVMe 1TB",          Price =   599.90m, Stock =  80 },
                 new ProductViewModel { Id =  8, Name = "Câmera Web HD",          Price =   129.99m, Stock = 120 },
-                new ProductViewModel { Id =  9, Name = "Fonte 650W 80+ Gold",    Price =   459.00m, Stock =  25 },
-                new ProductViewModel { Id = 10, Name = "Gabinete Mid-Tower",     Price =   299.00m, Stock =  40 }
+                new ProductViewModel { Id =  9, Name = "Fonte 650W 80+ Gold",    Price =   459.00m, Stock =  25 }
             };
         }
     }
