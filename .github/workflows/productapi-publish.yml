@@ -61,5 +61,5 @@ jobs:
           docker run -d `
             --name productapi-container `
             -p 8088:80 `
-            -e ASPNETCORE_URLS="http://+:80" ` 
+            -e ASPNETCORE_URLS="http://+:80" `
             $Env:IMAGE_NAME
